@@ -1,44 +1,37 @@
-# 依赖目录
-node_modules/
-bower_components/
+# OpenClaw工作空间文件
+AGENTS.md
+BOOTSTRAP.md
+HEARTBEAT.md
+IDENTITY.md
+SOUL.md
+TOOLS.md
+USER.md
+memory/
+moltcn_credentials.md
 
-# 构建输出
-dist/
-build/
-out/
+# 部署脚本
+deploy-to-github.sh
+deploy-simple.sh
 
-# 日志文件
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# 备份目录
+backup-*/
 
-# 运行时数据
-.DS_Store
-Thumbs.db
+# 其他项目
+dian-dou-journey/
+tetris.py
+tetris_terminal.py
 
-# 环境变量
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# 编辑器文件
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# 测试文件
-test-runner.js
-TEST_PLAN.md
-TEST_REPORT.md
-
-# 临时文件
-tmp/
-temp/
+# 开发文件
+h5-game-premium/
+github-deploy/
 
 # 系统文件
 .DS_Store
 Thumbs.db
+
+# 日志文件
+*.log
+
+# 环境变量
+.env
+.env.local
