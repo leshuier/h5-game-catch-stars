@@ -21,16 +21,9 @@ document.addEventListener('DOMContentLoaded', function() {
             width: 100,
             height: 20,
             speed: 8,
-            color: '#4dffea',
-            skin: 'default' // 皮肤系统
+            color: '#4dffea'
         },
-        keys: {},
-        purchases: {
-            doubleScore: false,
-            rainbowBasket: false,
-            sparkleEffect: false
-        },
-        multiplier: 1 // 分数乘数
+        keys: {}
     };
     
     // 获取DOM元素
@@ -63,32 +56,8 @@ document.addEventListener('DOMContentLoaded', function() {
         game.lastDropTime = 0;
         game.basket.x = canvas.width / 2 - 50;
         
-        // 检查购买状态
-        checkPurchases();
-        
         updateUI();
         gameOverElement.classList.add('hidden');
-    }
-    
-    // 检查购买状态
-    function checkPurchases() {
-        const purchases = JSON.parse(localStorage.getItem('game_purchases') || '[]');
-        
-        // 双倍分数
-        if (purchases.includes('powerup_double') || purchases.includes('powerup')) {
-            game.purchases.doubleScore = true;
-            game.multiplier = 2;
-        }
-        
-        // 彩虹篮子
-        if (purchases.includes('skin_rainbow') || purchases.includes('skin1')) {
-            game.purchases.rainbowBasket = true;
-        }
-        
-        // 星光特效
-        if (purchases.includes('skin_sparkle') || purchases.includes('skin2')) {
-            game.purchases.sparkleEffect = true;
-        }
     }
     
     // 更新UI显示
@@ -129,25 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 绘制篮子
     function drawBasket() {
-        ctx.save();
-        
-        if (game.purchases.rainbowBasket) {
-            // 彩虹渐变效果
-            const gradient = ctx.createLinearGradient(
-                game.basket.x, game.basket.y,
-                game.basket.x + game.basket.width, game.basket.y + game.basket.height
-            );
-            gradient.addColorStop(0, '#FF0000');
-            gradient.addColorStop(0.2, '#FF7F00');
-            gradient.addColorStop(0.4, '#FFFF00');
-            gradient.addColorStop(0.6, '#00FF00');
-            gradient.addColorStop(0.8, '#0000FF');
-            gradient.addColorStop(1, '#8B00FF');
-            ctx.fillStyle = gradient;
-        } else {
-            ctx.fillStyle = game.basket.color;
-        }
-        
+        ctx.fillStyle = game.basket.color;
         ctx.fillRect(game.basket.x, game.basket.y, game.basket.width, game.basket.height);
         
         // 篮子装饰
@@ -160,30 +111,11 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.strokeStyle = '#FFFFFF';
         ctx.lineWidth = 3;
         ctx.stroke();
-        
-        // 如果购买了双倍分数，显示特效
-        if (game.purchases.doubleScore) {
-            ctx.fillStyle = 'rgba(255, 215, 0, 0.3)';
-            ctx.fillRect(game.basket.x - 5, game.basket.y - 5, game.basket.width + 10, game.basket.height + 10);
-            
-            // 显示"2x"文字
-            ctx.font = 'bold 16px Arial';
-            ctx.fillStyle = '#FFD700';
-            ctx.textAlign = 'center';
-            ctx.fillText('2x', game.basket.x + game.basket.width/2, game.basket.y - 15);
-        }
-        
-        ctx.restore();
     }
     
     // 绘制物体
     function drawObject(obj) {
         ctx.save();
-        
-        // 如果购买了星光特效，添加尾迹
-        if (game.purchases.sparkleEffect) {
-            drawSparkleTrail(obj);
-        }
         
         // 绘制圆形物体
         ctx.beginPath();
@@ -203,42 +135,6 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(obj.type.emoji, obj.x, obj.y);
-        
-        ctx.restore();
-    }
-    
-    // 绘制星光尾迹
-    function drawSparkleTrail(obj) {
-        ctx.save();
-        
-        // 创建尾迹渐变
-        const gradient = ctx.createRadialGradient(
-            obj.x, obj.y, 0,
-            obj.x, obj.y, obj.radius * 3
-        );
-        gradient.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
-        gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.3)');
-        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-        
-        // 绘制尾迹
-        ctx.beginPath();
-        ctx.arc(obj.x, obj.y, obj.radius * 3, 0, Math.PI * 2);
-        ctx.fillStyle = gradient;
-        ctx.fill();
-        
-        // 添加随机星光点
-        for (let i = 0; i < 3; i++) {
-            const angle = Math.random() * Math.PI * 2;
-            const distance = Math.random() * obj.radius * 2;
-            const sparkleX = obj.x + Math.cos(angle) * distance;
-            const sparkleY = obj.y + Math.sin(angle) * distance;
-            const size = Math.random() * 3 + 1;
-            
-            ctx.beginPath();
-            ctx.arc(sparkleX, sparkleY, size, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-            ctx.fill();
-        }
         
         ctx.restore();
     }
@@ -321,14 +217,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 处理接住的物体
     function handleObjectCaught(obj, index) {
-        // 计算实际得分（应用乘数）
-        const actualScore = obj.type.score * game.multiplier;
-        
         // 显示得分效果
-        showEffect(obj.x, obj.y, `+${actualScore}`, obj.color);
+        showEffect(obj.x, obj.y, `+${obj.type.score}`, obj.color);
         
         // 更新分数
-        game.score += actualScore;
+        game.score += obj.type.score;
         
         // 如果是炸弹，扣生命值
         if (obj.type === OBJECT_TYPES.BOMB) {
@@ -404,14 +297,6 @@ document.addEventListener('DOMContentLoaded', function() {
             finalScoreElement.textContent = game.score;
             finalLevelElement.textContent = game.level;
             gameOverElement.classList.remove('hidden');
-            
-            // 游戏结束时显示插页广告
-            if (window.adManager && window.adManager.userPrefs.adsEnabled) {
-                setTimeout(() => {
-                    window.adManager.showInterstitial();
-                }, 500);
-            }
-            
             return true;
         }
         return false;
@@ -464,14 +349,6 @@ document.addEventListener('DOMContentLoaded', function() {
             pauseBtn.innerHTML = '<i class="fas fa-pause"></i> 暂停';
             game.lastDropTime = performance.now();
             requestAnimationFrame(gameLoop);
-            
-            // 显示插页广告（如果启用）
-            if (window.adManager && window.adManager.userPrefs.adsEnabled) {
-                // 延迟显示，让游戏先开始
-                setTimeout(() => {
-                    window.adManager.showInterstitial();
-                }, 1000);
-            }
         }
     }
     
