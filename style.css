@@ -130,7 +130,9 @@ h1 {
     display: flex;
     gap: 30px;
     margin-bottom: 30px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: flex-start;
 }
 
 #gameCanvas {
@@ -142,6 +144,7 @@ h1 {
     height: 500px;
     max-width: 100%;
     object-fit: contain;
+    flex-shrink: 0;
 }
 
 .right-panel {
@@ -498,6 +501,23 @@ footer {
 }
 
 /* 响应式设计 */
+@media (max-width: 1180px) {
+    .game-container {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    #gameCanvas {
+        width: 100%;
+        max-width: 800px;
+    }
+    
+    .right-panel {
+        flex: 1 1 350px;
+        max-width: 100%;
+    }
+}
+
 @media (max-width: 768px) {
     .container {
         padding: 20px;
